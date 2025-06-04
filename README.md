@@ -2,7 +2,8 @@
 
 This project provides tools to automatically download YouTube Shorts, train a model
 on existing media, gather news, generate new videos and upload them back to
-YouTube. A simple Tkinter GUI brings all the pieces together.
+YouTube. All features are combined into a single script `app.py` with a simple
+Tkinter GUI.
 
 ## Features
 
@@ -28,7 +29,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```
-python -m gui.main
+python app.py
 ```
 
 The application will prompt for a YouTube API key. From there you can
