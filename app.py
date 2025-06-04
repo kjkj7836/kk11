@@ -49,9 +49,9 @@ def download_korean_shorts(output_dir: str, max_results: int = 5) -> List[str]:
     return urls
 
 
-# 간단한 학습기 클래스
+# 딥러닝 학습기 클래스
 class Trainer:
-    """PyTorch 또는 TensorFlow를 이용한 학습기"""
+    """PyTorch 또는 TensorFlow로 간단한 딥러닝 모델을 학습한다."""
 
     def __init__(self, checkpoint: Optional[str] = None, use_gpu: bool = True) -> None:
         self.checkpoint = checkpoint
@@ -62,16 +62,36 @@ class Trainer:
         else:
             self._init_model()
 
+    def _generate_dummy_data(self, samples: int = 100):
+        """랜덤 데이터를 생성하여 학습에 사용한다."""
+        if torch:
+            x = torch.randn(samples, 10)
+            y = x.sum(dim=1, keepdim=True)
+            return list(zip(x, y))
+        elif tf:
+            x = tf.random.normal((samples, 10))
+            y = tf.reduce_sum(x, axis=1, keepdims=True)
+            return list(zip(x, y))
+        return []
+
     def _init_model(self) -> None:
         if torch:
-            self.model = nn.Linear(10, 1)
+            self.model = nn.Sequential(
+                nn.Linear(10, 64),
+                nn.ReLU(),
+                nn.Linear(64, 64),
+                nn.ReLU(),
+                nn.Linear(64, 1),
+            )
             if self.use_gpu:
                 self.model.cuda()
             self.optimizer = optim.Adam(self.model.parameters())
             self.loss_fn = nn.MSELoss()
         elif tf:
             self.model = tf.keras.Sequential([
-                tf.keras.layers.Dense(1, input_shape=(10,)),
+                tf.keras.layers.Dense(64, activation="relu", input_shape=(10,)),
+                tf.keras.layers.Dense(64, activation="relu"),
+                tf.keras.layers.Dense(1),
             ])
             self.model.compile(optimizer="adam", loss="mse")
         else:
@@ -85,22 +105,26 @@ class Trainer:
         else:
             self._init_model()
 
-    def train(self, data) -> None:
-        """데이터를 이용해 모델을 학습한다. 여기서는 예시용 빈 메서드"""
+    def train(self, data=None, epochs: int = 5) -> None:
+        """주어진 데이터로 모델을 학습한다."""
+        if data is None:
+            data = self._generate_dummy_data()
+
         if torch and isinstance(self.model, nn.Module):
             self.model.train()
-            for x, y in data:
-                if self.use_gpu:
-                    x = x.cuda()
-                    y = y.cuda()
-                self.optimizer.zero_grad()
-                pred = self.model(x)
-                loss = self.loss_fn(pred, y)
-                loss.backward()
-                self.optimizer.step()
+            for _ in range(epochs):
+                for x, y in data:
+                    if self.use_gpu:
+                        x = x.cuda()
+                        y = y.cuda()
+                    self.optimizer.zero_grad()
+                    pred = self.model(x)
+                    loss = self.loss_fn(pred, y)
+                    loss.backward()
+                    self.optimizer.step()
         elif tf:
             x, y = zip(*data)
-            self.model.fit(tf.stack(x), tf.stack(y))
+            self.model.fit(tf.stack(x), tf.stack(y), epochs=epochs)
         else:
             raise RuntimeError("학습할 수 있는 백엔드가 없습니다")
 
@@ -176,7 +200,7 @@ class Application(tk.Tk):
         self.geometry("400x400")
         self.api_key_var = tk.StringVar()
 
-        tk.Label(self, text="YouTube API 키:").pack()
+        tk.Label(self, text="유튜브 API 키:").pack()
         tk.Entry(self, textvariable=self.api_key_var, width=50).pack()
         tk.Button(self, text="쇼츠 다운로드", command=self.download_shorts).pack(fill=tk.X)
         tk.Button(self, text="모델 학습", command=self.train_model).pack(fill=tk.X)
@@ -196,12 +220,13 @@ class Application(tk.Tk):
 
     def train_model(self) -> None:
         self.trainer = Trainer()
-        data = []  # 실제 데이터 로딩 부분은 구현되지 않음
-        self.trainer.train(data)
+        self.trainer.train()
         file = filedialog.asksaveasfilename(defaultextension=".pt")
         if file:
             self.trainer.save(file)
-            messagebox.showinfo("모델", "모델 저장 완료")
+            messagebox.showinfo("모델", "모델 학습 및 저장 완료")
+        else:
+            messagebox.showinfo("모델", "모델 학습 완료")
 
     def fetch_news(self) -> None:
         api_key = self.api_key_var.get()

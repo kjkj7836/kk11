@@ -1,51 +1,46 @@
-# kk11 Automation Project
+# kk11 자동화 프로젝트
 
-This project provides tools to automatically download YouTube Shorts, train a model
-on existing media, gather news, generate new videos and upload them back to
-YouTube. All features are combined into a single script `app.py` with a simple
-Tkinter GUI.
+이 스크립트는 유튜브 쇼츠 다운로드부터 뉴스 수집, 딥러닝 학습, 영상 생성, 업로드까지 한 번에 처리하는 간단한 도구입니다. `app.py` 한 파일로 모든 기능을 제공합니다.
 
-## Features
+## 주요 기능
 
-* **YouTube Downloader** – Downloads Korean Shorts with at least 100k views using
-  `pytube`.
-* **Model Training** – Simple framework based on PyTorch or TensorFlow with GPU
-  support when available. Training can resume from saved checkpoints.
-* **News Fetcher** – Retrieves recent news while filtering out politics, war and
-  violence related stories via the NewsAPI service.
-* **Video Generator** – Creates a short video from text using `moviepy`.
-* **YouTube Uploader** – Uploads generated videos through the YouTube Data API.
-* **GUI** – Tkinter based interface to drive the whole workflow.
+* **유튜브 다운로드** – `pytube`를 이용해 조회수 100k 이상 한국어 쇼츠 영상을 내려받습니다.
+* **모델 학습** – PyTorch 또는 TensorFlow 기반의 간단한 딥러닝 모델을 GPU가 있을 경우 활용하여 학습합니다.
+* **뉴스 수집** – NewsAPI를 이용해 정치·전쟁·폭력 기사를 제외한 최신 뉴스를 가져옵니다.
+* **영상 생성** – `moviepy`로 텍스트 클립을 이어 붙여 영상 파일을 만듭니다.
+* **유튜브 업로드** – YouTube Data API를 사용해 결과 영상을 업로드합니다.
+* **GUI** – Tkinter로 구현된 그래픽 인터페이스에서 위 기능들을 실행합니다.
 
-## Installation
+## 설치 방법
 
-1. Clone this repository.
-2. Install dependencies:
+1. 저장소를 클론합니다.
+2. 필요한 패키지를 설치합니다.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+## 사용 방법
 
-```
+```bash
 python app.py
 ```
 
-The application will prompt for a YouTube API key. From there you can
-- download shorts
-- train the model
-- fetch news
-- generate a video
-- upload the result back to YouTube.
+프로그램을 실행하면 유튜브 API 키 입력을 요청합니다. 이후 버튼을 통해
+- 쇼츠 다운로드
+- 모델 학습
+- 뉴스 가져오기
+- 영상 생성
+- 유튜브 업로드
+순서로 사용할 수 있습니다.
 
-## Dependencies
+## 의존성
 
 - pytube
 - moviepy
 - google-api-python-client
 - requests
-- torch *(optional)*
-- tensorflow *(optional)*
+- torch *(선택)*
+- tensorflow *(선택)*
 
-Install these manually or via `requirements.txt`.
+`requirements.txt` 파일을 이용해 한 번에 설치할 수 있습니다.
